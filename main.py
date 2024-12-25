@@ -1,7 +1,9 @@
 import cv2
 import os
 import pickle
+import numpy as np
 import face_recognition
+import cvzone
 
 cap = cv2.VideoCapture(0)
 cap.set(3,640)
@@ -29,6 +31,10 @@ encodelistKnown, stuIds = encodeListKnownWithIDs
 # print(stuIds)
 print("Encoded file loaded !")
 
+modeType = 0
+counter = 0
+id = -1
+
 while True:
     success, img = cap.read()
 
@@ -48,6 +54,25 @@ while True:
 
         print("matches: ", matches)
         print("face distance: ", faceDist)
+
+        matchedIndex = np.argmin(faceDist)
+
+        if matches[matchedIndex]:
+            # print("known face detected <3 <3 <3")
+            y1, x2, y2, x1 = faceLoc
+            y1, x2, y2, x1 = y1*4, x2*4, y2*4, x1*4
+            bbox = 55+x1, 162+y1, x2-x1, y2-y1
+            imgBackground= cvzone.cornerRect(imgBackground, bbox, rt=0)
+            id = stuIds[matchedIndex]
+
+            if counter == 0:
+                counter = 1
+
+    if counter != 0:
+
+
+        counter += 1            
+
 
     cv2.imshow("WEBCAM", img)
     cv2.imshow("Facial Attendance", imgBackground)
